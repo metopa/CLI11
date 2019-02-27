@@ -13,19 +13,15 @@ class Streamable {};
 std::ostream &operator<<(std::ostream &out, const Streamable &) { return out << "Streamable"; }
 
 TEST(TypeTools, Streaming) {
-    std::stringstream a, b, c, d;
 
-    CLI::detail::to_stream(a, NotStreamable{});
-    EXPECT_EQ(a.str(), "");
+    EXPECT_EQ(CLI::detail::to_string(NotStreamable{}), "");
 
-    CLI::detail::to_stream(b, Streamable{});
-    EXPECT_EQ(b.str(), "Streamable");
+    EXPECT_EQ(CLI::detail::to_string(Streamable{}), "Streamable");
 
-    CLI::detail::to_stream(c, 5);
-    EXPECT_EQ(c.str(), "5");
+    EXPECT_EQ(CLI::detail::to_string(5), "5");
 
-    CLI::detail::to_stream(d, "string");
-    EXPECT_EQ(d.str(), "string");
+    EXPECT_EQ(CLI::detail::to_string("string"), std::string("string"));
+    EXPECT_EQ(CLI::detail::to_string(std::string("string")), std::string("string"));
 }
 
 TEST(Split, SimpleByToken) {

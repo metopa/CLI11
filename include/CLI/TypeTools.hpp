@@ -137,15 +137,29 @@ template <typename S, typename T> class is_streamable {
     static const bool value = decltype(test<S, T>(0))::value;
 };
 
-/// Stream a value into a stream (streaming must be supported for that type)
-template <typename T, typename V, enable_if_t<is_streamable<T, V>::value, detail::enabler> = detail::dummy>
-void to_stream(T &&stream, V &&value) {
-    stream << value;
+/// Convert an object to a string (directly forward if this can become a string)
+template <typename T, enable_if_t<std::is_constructible<std::string, T>::value, detail::enabler> = detail::dummy>
+auto to_string(T &&value) -> decltype(std::forward<T>(value)) {
+    return std::forward<T>(value);
 }
 
-/// Stream nothing into a stream (streaming is not supported for that type)
-template <typename T, typename V, enable_if_t<!is_streamable<T, V>::value, detail::enabler> = detail::dummy>
-void to_stream(T &&, V &&) {}
+/// Convert an object to a string (streaming must be supported for that type)
+template <typename T,
+          enable_if_t<!std::is_constructible<std::string, T>::value && is_streamable<std::stringstream, T>::value,
+                      detail::enabler> = detail::dummy>
+std::string to_string(T &&value) {
+    std::stringstream stream;
+    stream << value;
+    return stream.str();
+}
+
+/// If conversion is not supported, return an empty string (streaming is not supported for that type)
+template <typename T,
+          enable_if_t<!std::is_constructible<std::string, T>::value && !is_streamable<std::stringstream, T>::value,
+                      detail::enabler> = detail::dummy>
+std::string to_string(T &&) {
+    return std::string{};
+}
 
 // Type name print
 
