@@ -124,6 +124,29 @@ struct pair_adaptor<
     }
 };
 
+// Check for streamability
+// Based on https://stackoverflow.com/questions/22758291/how-can-i-detect-if-a-type-can-be-streamed-to-an-stdostream
+
+template <typename S, typename T> class is_streamable {
+    template <typename SS, typename TT>
+    static auto test(int) -> decltype(std::declval<SS &>() << std::declval<TT>(), std::true_type());
+
+    template <typename, typename> static auto test(...) -> std::false_type;
+
+  public:
+    static const bool value = decltype(test<S, T>(0))::value;
+};
+
+/// Stream a value into a stream (streaming must be supported for that type)
+template <typename T, typename V, enable_if_t<is_streamable<T, V>::value, detail::enabler> = detail::dummy>
+void to_stream(T &&stream, V &&value) {
+    stream << value;
+}
+
+/// Stream nothing into a stream (streaming is not supported for that type)
+template <typename T, typename V, enable_if_t<!is_streamable<T, V>::value, detail::enabler> = detail::dummy>
+void to_stream(T &&, V &&) {}
+
 // Type name print
 
 /// Was going to be based on

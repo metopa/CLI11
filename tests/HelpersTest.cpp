@@ -6,6 +6,28 @@
 #include <fstream>
 #include <string>
 
+class NotStreamable {};
+
+class Streamable {};
+
+std::ostream &operator<<(std::ostream &out, const Streamable &) { return out << "Streamable"; }
+
+TEST(TypeTools, Streaming) {
+    std::stringstream a, b, c, d;
+
+    CLI::detail::to_stream(a, NotStreamable{});
+    EXPECT_EQ(a.str(), "");
+
+    CLI::detail::to_stream(b, Streamable{});
+    EXPECT_EQ(b.str(), "Streamable");
+
+    CLI::detail::to_stream(c, 5);
+    EXPECT_EQ(c.str(), "5");
+
+    CLI::detail::to_stream(d, "string");
+    EXPECT_EQ(d.str(), "string");
+}
+
 TEST(Split, SimpleByToken) {
     auto out = CLI::detail::split("one.two.three", '.');
     ASSERT_EQ(3u, out.size());
