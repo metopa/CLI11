@@ -231,6 +231,9 @@ class Option : public OptionBase<Option> {
     /// True if this option has a default
     bool default_{false};
 
+    /// Run this function to capture a default (ignore if empty)
+    std::function<std::string()> default_function_;
+
     ///@}
     /// @name Configuration
     ///@{
@@ -930,6 +933,21 @@ class Option : public OptionBase<Option> {
             required_ = false;
         if(option_type_size < 0)
             expected_ = -1;
+        return this;
+    }
+
+    /// Set a capture function for the default. Mostly used by App.
+    Option *default_function(const std::function<std::string()> &func) {
+        default_function_ = func;
+        return this;
+    }
+
+    /// Capture the default value from the original value (if it can be captured)
+    Option *capture_default() {
+        if(default_function_) {
+            defaultval_ = default_function_();
+            default_ = true;
+        }
         return this;
     }
 

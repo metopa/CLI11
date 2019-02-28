@@ -414,9 +414,12 @@ class App {
 
         Option *opt = add_option(option_name, fun, option_description, defaulted);
         opt->type_name(detail::type_name<T>());
-        if(defaulted) {
-            opt->default_str(CLI::detail::to_string(variable));
-        }
+
+        opt->default_function([&variable]() { return std::string(CLI::detail::to_string(variable)); });
+
+        if(defaulted)
+            opt->capture_default();
+
         return opt;
     }
 
@@ -475,14 +478,17 @@ class App {
         Option *opt = add_option(option_name, fun, option_description, defaulted);
         opt->type_name(detail::type_name<T>())->type_size(-1);
 
-        if(defaulted) {
+        opt->default_function([&variable]() {
             std::vector<std::string> defaults;
             defaults.resize(variable.size());
             std::transform(variable.begin(), variable.end(), defaults.begin(), [](T &val) {
                 return std::string(CLI::detail::to_string(val));
             });
-            opt->default_str("[" + detail::join(defaults) + "]");
-        }
+            return std::string("[" + detail::join(defaults) + "]");
+        });
+
+        if(defaulted)
+            opt->capture_default();
 
         return opt;
     }
