@@ -745,6 +745,12 @@ TEST_F(TApp, MakeUnstreamableOptiions) {
     Unstreamable value;
     app.add_option("--value", value);
 
-    // This fails to build, since it tries to stream from Unstreamable
-    // app.add_option("--value", value, "", false);
+    // This used to fail to build, since it tries to stream from Unstreamable
+    app.add_option("--value2", value, "", false);
+
+    std::vector<Unstreamable> values;
+    app.add_option("--values", values);
+
+    // This used to fail to build, since it tries to stream from Unstreamable
+    app.add_option("--values2", values, "", false);
 }
