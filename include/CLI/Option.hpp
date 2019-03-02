@@ -943,7 +943,7 @@ class Option : public OptionBase<Option> {
     }
 
     /// Capture the default value from the original value (if it can be captured)
-    Option *capture_default() {
+    Option *capture_default_str() {
         if(default_function_) {
             defaultval_ = default_function_();
             default_ = true;

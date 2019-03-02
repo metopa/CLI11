@@ -721,7 +721,7 @@ TEST(ValidatorTests, ValidatorDefaults) {
     EXPECT_EQ(V2.get_description(), "check");
     EXPECT_TRUE(V2.get_active());
     EXPECT_TRUE(V2.get_modifying());
-// This class only support streaming in, not out
+    // This class only support streaming in, not out
 }
 
 class Unstreamable {
