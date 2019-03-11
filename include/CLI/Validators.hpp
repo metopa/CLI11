@@ -748,7 +748,7 @@ class SuffixedNumber : public Validator {
     };
 
     template <typename Number>
-    SuffixedNumber(std::map<std::string, Number> mapping, const std::string &name = "SUFFIX", Options opts = DEFAULT) {
+    SuffixedNumber(std::map<std::string, Number> mapping, Options opts = DEFAULT, const std::string& name = "SUFFIX") {
         // generate description
         std::stringstream out;
         out << detail::type_name<Number>() << ' ';
@@ -762,6 +762,9 @@ class SuffixedNumber : public Validator {
 
         // validate mapping
         for(auto &kv : mapping) {
+            if (kv.first.empty()) {
+                throw ValidationError("Suffix must not be empty.");
+            }
             if(!detail::isalpha(kv.first)) {
                 throw ValidationError("Suffix must contain only letters.");
             }
@@ -798,7 +801,7 @@ class SuffixedNumber : public Validator {
                                       " suffix not recognized. Allowed values: " + detail::generate_map(mapping, true));
             }
 
-            // perform sefa multiplication
+            // perform safe multiplication
             bool ok = detail::checked_multiply(num, it->second);
             if(!ok) {
                 throw ValidationError(detail::as_string(num) + " multiplied by " + suffix +
